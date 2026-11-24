@@ -30,14 +30,14 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
     },
     {
       name: 'Growth Engine',
-      badge: 'Most Popular',
+      badge: 'Recommended',
       originalPrice: '₹9,999',
       discountPrice: '₹5,999',
       discountBadge: '40% OFF',
       period: 'per month',
       description: 'High-velocity creative testing engine for scaling D2C brands and performance agencies running weekly ad sets.',
       features: [
-        '25 Ready-to-Shoot Creative Briefs/Mo',
+        '25 Ready-to-Shoot Creative Briefs/Mo (~6 briefs/week)',
         '3 Scroll-Stopping Hooks per Brief (75 tested hooks)',
         'Psychology Matrix (Loss Aversion, Skeptic, Us vs Them)',
         'Full 60s Shoot Scripts + On-Screen Text Overlays',
@@ -58,8 +58,8 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
       period: 'per month',
       description: 'High-volume creative strategy for aggressive advertisers and agencies demanding rapid, daily hook iteration.',
       features: [
-        '60 Ready-to-Shoot Creative Briefs/Mo (2 briefs/day avg)',
-        '3-5 Tested Hooks per Concept (180+ hook variations)',
+        '50 Ready-to-Shoot Creative Briefs/Mo (High-Volume Testing)',
+        '3-5 Tested Hooks per Concept (150+ hook variations)',
         'Competitor Ad Outlier Teardowns in Your Niche',
         'Full 60s Storyboards with Exact Editing Cue Sheets',
         '24-Hour Express Turnaround',
@@ -88,23 +88,25 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch pt-2">
           {plans.map((plan, idx) => (
             <TiltCard key={idx} className="rounded-2xl h-full flex flex-col" maxTilt={8}>
               <div
                 className={`rounded-2xl p-7 flex flex-col justify-between transition-all duration-300 relative h-full ${
                   plan.highlighted
-                    ? 'bg-zinc-900/90 border-2 border-purple-500/60 shadow-2xl shadow-purple-950/40'
+                    ? 'bg-zinc-900/90 border-2 border-purple-500/70 shadow-2xl shadow-purple-950/50'
                     : 'bg-zinc-900/40 border border-zinc-800 hover:border-zinc-700'
                 }`}
               >
-                {plan.highlighted && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-0.5 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 text-[11px] font-mono font-bold text-white tracking-wider shadow-md">
-                    RECOMMENDED
-                  </div>
-                )}
-
                 <div>
+                  {/* Clean, Non-Clipped Top Tag for Highlighted Plan */}
+                  {plan.highlighted && (
+                    <div className="mb-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-purple-500/20 via-indigo-500/20 to-blue-500/20 text-purple-300 border border-purple-500/40 text-[10px] font-mono font-bold uppercase tracking-wider shadow-sm">
+                      <Sparkles className="w-3 h-3 text-purple-400 animate-pulse" />
+                      <span>RECOMMENDED CHOICE</span>
+                    </div>
+                  )}
+
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-lg font-bold text-white">{plan.name}</h3>
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">
@@ -156,7 +158,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
                 <a
                   href={plan.ctaHref}
                   onClick={onSelectPlan}
-                  className={`w-full py-3 rounded-xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all mt-6 ${
+                  className={`w-full py-3 rounded-xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all mt-6 cursor-pointer ${
                     plan.highlighted
                       ? 'bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white shadow-lg shadow-purple-600/30'
                       : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700'
