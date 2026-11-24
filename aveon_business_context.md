@@ -8,6 +8,8 @@
 * **Name:** AVEON (rebranded from **NEXORA** in July 2026)
 * **Founder:** Solo-founded by Shabd (operating lean out of VIT Bhopal, Madhya Pradesh, India).
 * **Core Thesis:** Build an AI-native, vertically integrated media-tech company to compete with legacy/high-headcount media machines (such as AEOS by Varun Mayya).
+* **Live Production URL:** [https://aveon-phi.vercel.app](https://aveon-phi.vercel.app)
+* **GitHub Repository:** [https://github.com/Shabd-Mathur/AVEON](https://github.com/Shabd-Mathur/AVEON)
 * **Operating Principle:** **Maximum Automation.** AI agents handle the majority of engineering, research, scripting, creative briefing, and operational workflows. Keep human headcount minimal and protect margins through software-first execution.
 
 ---
