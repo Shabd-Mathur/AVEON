@@ -3,7 +3,7 @@ import { generateAdBrief, GeneratedAdBrief, AdBriefInput } from '../engine/adGen
 import { generateAdWithGemini } from '../engine/geminiAdGenerator';
 import { PSYCHOLOGY_TRIGGERS } from '../engine/psychology';
 import { BriefCard } from './BriefCard';
-import { Sparkles, Sliders, Play, RefreshCw, Wand2, Lightbulb, Cpu, Key, Check } from 'lucide-react';
+import { Sparkles, Sliders, Play, RefreshCw, Wand2, Lightbulb, Cpu, Key, Check, AlertCircle } from 'lucide-react';
 
 export const InteractiveStudio: React.FC = () => {
   const PRESETS: { label: string; description: string; data: AdBriefInput }[] = [
@@ -61,7 +61,8 @@ export const InteractiveStudio: React.FC = () => {
   const [formData, setFormData] = useState<AdBriefInput>(emptyForm);
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentBrief, setCurrentBrief] = useState<GeneratedAdBrief | null>(null);
-  const [aiModelStatus, setAiModelStatus] = useState<string>('Gemini 3.5 Flash Active');
+  const [generationError, setGenerationError] = useState<string | null>(null);
+  const [isLiveAiGenerated, setIsLiveAiGenerated] = useState<boolean>(false);
   const [showKeyModal, setShowKeyModal] = useState(false);
   const [customKey, setCustomKey] = useState(() => (typeof window !== 'undefined' ? localStorage.getItem('aveon_gemini_key') || '' : ''));
   const [keySaved, setKeySaved] = useState(false);
@@ -79,16 +80,17 @@ export const InteractiveStudio: React.FC = () => {
 
   const handlePresetSelect = async (preset: typeof PRESETS[0]) => {
     setFormData(preset.data);
+    setGenerationError(null);
     setIsGenerating(true);
-    setAiModelStatus('Synthesizing with Gemini 3.5 Flash...');
     try {
       const brief = await generateAdWithGemini(preset.data, customKey || undefined);
       setCurrentBrief(brief);
-      setAiModelStatus('Gemini 3.5 Flash Active');
-    } catch (err) {
-      console.warn('Gemini generation fallback:', err);
+      setIsLiveAiGenerated(true);
+    } catch (err: any) {
+      console.warn('Gemini generation failed:', err);
+      setGenerationError(err?.message || 'Gemini API temporary limit reached');
       setCurrentBrief(generateAdBrief(preset.data));
-      setAiModelStatus('Algorithmic Fallback Active');
+      setIsLiveAiGenerated(false);
     } finally {
       setIsGenerating(false);
     }
@@ -96,16 +98,17 @@ export const InteractiveStudio: React.FC = () => {
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
+    setGenerationError(null);
     setIsGenerating(true);
-    setAiModelStatus('Synthesizing with Gemini 3.5 Flash...');
     try {
       const brief = await generateAdWithGemini(formData, customKey || undefined);
       setCurrentBrief(brief);
-      setAiModelStatus('Gemini 3.5 Flash Active');
-    } catch (err) {
-      console.warn('Gemini generation fallback:', err);
+      setIsLiveAiGenerated(true);
+    } catch (err: any) {
+      console.warn('Gemini generation failed:', err);
+      setGenerationError(err?.message || 'Gemini API temporary limit reached');
       setCurrentBrief(generateAdBrief(formData));
-      setAiModelStatus('Algorithmic Fallback Active');
+      setIsLiveAiGenerated(false);
     } finally {
       setIsGenerating(false);
     }
@@ -119,14 +122,14 @@ export const InteractiveStudio: React.FC = () => {
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-mono mb-3 shadow-sm">
             <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <Cpu className="w-3.5 h-3.5 text-purple-400" />
-            <span>AI ENGINE: GOOGLE GEMINI 3.5 FLASH</span>
+            <span>AI ENGINE: GOOGLE GEMINI 3.5 FLASH (LIVE)</span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
             Interactive Creative Brief Studio
           </h2>
           <p className="mt-3 text-zinc-400 text-sm sm:text-base leading-relaxed">
-            Connected to Google Gemini 3.5 Flash. Generates bespoke, scroll-stopping 3-second hooks, 60-second shoot scripts, and video director cues for any brand in seconds.
+            Directly connected to Google Gemini 3.5 Flash. Generates 100% original, creative, scroll-stopping 3-second hooks, 60-second shoot scripts, and video director cues.
           </p>
         </div>
 
@@ -135,7 +138,7 @@ export const InteractiveStudio: React.FC = () => {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2 text-xs font-mono text-zinc-400">
               <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
-              <span>TEST WITH 1-CLICK PRESETS (GENERATES LIVE VIA GEMINI):</span>
+              <span>TEST WITH 1-CLICK PRESETS (GENERATES BESPOKE HOOKS):</span>
             </div>
 
             <button
@@ -143,22 +146,22 @@ export const InteractiveStudio: React.FC = () => {
               className="text-[11px] font-mono text-zinc-400 hover:text-purple-300 flex items-center gap-1.5 transition-colors px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800"
             >
               <Key className="w-3 h-3 text-purple-400" />
-              <span>AI Model Key</span>
+              <span>AI API Key</span>
             </button>
           </div>
 
           {/* Key Modal */}
           {showKeyModal && (
-            <div className="mb-6 p-4 rounded-xl bg-zinc-900/90 border border-purple-500/30 backdrop-blur-md">
+            <div className="mb-6 p-4 rounded-xl bg-zinc-900/95 border border-purple-500/40 backdrop-blur-md shadow-2xl">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold text-white flex items-center gap-2 font-mono">
                   <Key className="w-3.5 h-3.5 text-purple-400" />
                   Google Gemini API Configuration
                 </span>
-                <span className="text-[10px] text-zinc-500 font-mono">STORED IN BROWSER</span>
+                <span className="text-[10px] text-emerald-400 font-mono">ACTIVE KEY LOADED</span>
               </div>
               <p className="text-[11px] text-zinc-400 mb-3">
-                Pre-configured with your active Gemini 3.5 Flash key. You can update it or leave it as default.
+                Your Google AI Studio key is configured. You can update or replace it here anytime.
               </p>
               <div className="flex gap-2">
                 <input
@@ -186,7 +189,7 @@ export const InteractiveStudio: React.FC = () => {
                 key={idx}
                 type="button"
                 onClick={() => handlePresetSelect(preset)}
-                className={`p-3.5 rounded-xl text-left border transition-all ${
+                className={`p-3.5 rounded-xl text-left border transition-all cursor-pointer ${
                   formData.brandName === preset.data.brandName
                     ? 'bg-purple-950/30 border-purple-500/50 shadow-lg shadow-purple-900/20'
                     : 'bg-zinc-900/40 border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-900/70'
@@ -221,8 +224,8 @@ export const InteractiveStudio: React.FC = () => {
               </div>
               <button
                 type="button"
-                onClick={() => { setFormData(emptyForm); setCurrentBrief(null); }}
-                className="text-[11px] font-mono text-zinc-500 hover:text-zinc-300 transition-colors"
+                onClick={() => { setFormData(emptyForm); setCurrentBrief(null); setGenerationError(null); }}
+                className="text-[11px] font-mono text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
               >
                 Clear Form
               </button>
@@ -343,7 +346,7 @@ export const InteractiveStudio: React.FC = () => {
                 {isGenerating ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin text-white" />
-                    <span>Gemini 3.5 Flash Generating Creative Brief...</span>
+                    <span>Gemini 3.5 Flash Writing Custom Script...</span>
                   </>
                 ) : (
                   <>
@@ -357,6 +360,13 @@ export const InteractiveStudio: React.FC = () => {
 
           {/* Results Viewer (7 cols) */}
           <div className="lg:col-span-7">
+            {generationError && (
+              <div className="mb-4 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-2.5">
+                <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>AI Notice: {generationError}. Switched to local backup brief.</span>
+              </div>
+            )}
+
             {currentBrief ? (
               <BriefCard brief={currentBrief} />
             ) : (
@@ -364,7 +374,7 @@ export const InteractiveStudio: React.FC = () => {
                 <div className="h-12 w-12 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-4 text-purple-400">
                   <Play className="w-5 h-5 ml-0.5" />
                 </div>
-                <h4 className="text-base font-bold text-white mb-2">Live AI Studio Ready</h4>
+                <h4 className="text-base font-bold text-white mb-2">Live Gemini AI Studio Ready</h4>
                 <p className="text-xs text-zinc-400 max-w-sm leading-relaxed mb-6">
                   Fill in the parameters on the left or select a preset above. Powered by Google Gemini 3.5 Flash to generate 100% bespoke, scroll-stopping hooks and shoot scripts.
                 </p>
