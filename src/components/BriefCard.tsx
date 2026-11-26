@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { GeneratedAdBrief } from '../engine/adGenerator';
+import { exportBriefToPDF } from '../utils/pdfExport';
 import { Copy, Check, Eye, Film, Brain, Scissors, Download, Share2 } from 'lucide-react';
 
 interface BriefCardProps {
@@ -9,6 +10,18 @@ interface BriefCardProps {
 export const BriefCard: React.FC<BriefCardProps> = ({ brief }) => {
   const [activeTab, setActiveTab] = useState<'hooks' | 'script' | 'psychology' | 'editor'>('hooks');
   const [copied, setCopied] = useState(false);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
+
+  const handleDownloadPDF = () => {
+    try {
+      setDownloadingPdf(true);
+      exportBriefToPDF(brief);
+    } catch (err) {
+      console.error('Failed to generate PDF:', err);
+    } finally {
+      setTimeout(() => setDownloadingPdf(false), 800);
+    }
+  };
 
   const copyBriefMarkdown = () => {
     let md = `# AVEON Creative Ad Brief: ${brief.title}\n`;
@@ -70,8 +83,8 @@ export const BriefCard: React.FC<BriefCardProps> = ({ brief }) => {
           </p>
         </div>
 
-        {/* Action Button: Copy Markdown */}
-        <div className="flex items-center gap-2">
+        {/* Action Buttons: Copy Markdown & Download PDF */}
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={copyBriefMarkdown}
             className="px-3.5 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-mono font-medium border border-zinc-700 flex items-center gap-2 transition-all"
@@ -87,6 +100,16 @@ export const BriefCard: React.FC<BriefCardProps> = ({ brief }) => {
                 <span>Copy Full Brief (.md)</span>
               </>
             )}
+          </button>
+
+          <button
+            onClick={handleDownloadPDF}
+            disabled={downloadingPdf}
+            className="px-3.5 py-2 rounded-lg bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-mono font-medium shadow-lg shadow-purple-900/30 border border-purple-400/30 flex items-center gap-2 transition-all active:scale-[0.98] disabled:opacity-75 cursor-pointer"
+            title="Download executive branded PDF brief"
+          >
+            <Download className={`w-3.5 h-3.5 text-purple-200 ${downloadingPdf ? 'animate-bounce' : ''}`} />
+            <span>{downloadingPdf ? 'Generating PDF...' : 'Download Branded PDF'}</span>
           </button>
         </div>
       </div>
